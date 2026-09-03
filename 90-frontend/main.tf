@@ -28,6 +28,7 @@ resource "aws_instance" "frontend" {
 # =========================================================
 
 resource "null_resource" "frontend" {
+
   triggers = {
     instance_id = aws_instance.frontend.id
   }
@@ -72,7 +73,7 @@ resource "aws_ec2_instance_state" "frontend" {
 
 
 # =========================================================
-# CREATE GOLDEN AMI
+# CREATE FRONTEND GOLDEN AMI
 # =========================================================
 
 resource "aws_ami_from_instance" "frontend" {
@@ -90,6 +91,7 @@ resource "aws_ami_from_instance" "frontend" {
 # =========================================================
 
 resource "null_resource" "frontend_delete" {
+
   triggers = {
     instance_id = aws_instance.frontend.id
   }
@@ -109,11 +111,14 @@ resource "null_resource" "frontend_delete" {
 # =========================================================
 
 resource "aws_lb_target_group" "frontend" {
-  name = local.resource_name
+  name = "${var.project_name}-${var.environment}-frontend-tg"
 
   port     = 80
   protocol = "HTTP"
-  vpc_id   = local.vpc_id
+
+  vpc_id = local.vpc_id
+
+  target_type = "instance"
 
   deregistration_delay = 60
 
@@ -121,8 +126,8 @@ resource "aws_lb_target_group" "frontend" {
     enabled             = true
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    timeout             = 5
     interval            = 10
+    timeout             = 5
     protocol            = "HTTP"
     port                = "traffic-port"
     path                = "/"
@@ -143,6 +148,7 @@ resource "aws_lb_target_group" "frontend" {
 # =========================================================
 
 resource "aws_launch_template" "frontend" {
+
   name = local.resource_name
 
   image_id = aws_ami_from_instance.frontend.id
@@ -186,14 +192,17 @@ resource "aws_launch_template" "frontend" {
 # =========================================================
 
 resource "aws_autoscaling_group" "frontend" {
+
   name = local.resource_name
 
-  max_size         = 10
   min_size         = 1
+  max_size         = 10
   desired_capacity = 1
 
-  health_check_grace_period = 180
   health_check_type         = "ELB"
+  health_check_grace_period = 180
+
+  vpc_zone_identifier = local.public_subnet_ids
 
   target_group_arns = [
     aws_lb_target_group.frontend.arn
@@ -203,8 +212,6 @@ resource "aws_autoscaling_group" "frontend" {
     id      = aws_launch_template.frontend.id
     version = "$Latest"
   }
-
-  vpc_zone_identifier = local.public_subnet_ids
 
   instance_refresh {
     strategy = "Rolling"
@@ -249,13 +256,15 @@ resource "aws_autoscaling_group" "frontend" {
 # =========================================================
 
 resource "aws_autoscaling_policy" "frontend" {
-  name = "${local.resource_name}-frontend"
+
+  name = "${local.resource_name}-scaling"
 
   policy_type = "TargetTrackingScaling"
 
   autoscaling_group_name = aws_autoscaling_group.frontend.name
 
   target_tracking_configuration {
+
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
@@ -270,6 +279,7 @@ resource "aws_autoscaling_policy" "frontend" {
 # =========================================================
 
 resource "aws_lb_listener_rule" "frontend" {
+
   listener_arn = data.aws_ssm_parameter.web_alb_listener_arn.value
 
   priority = 10

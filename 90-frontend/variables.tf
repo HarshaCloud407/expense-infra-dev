@@ -1,19 +1,35 @@
 variable "project_name" {
-    default = "expense"
+  type    = string
+  default = "expense"
 }
 
 variable "environment" {
-    default = "dev"
+  type    = string
+  default = "dev"
 }
 
-variable "common_tags" {
-    default = {
-        Project = "expense"
-        Environment = "dev"
-        Terraform = "true"
-    }
+variable "instance_type" {
+  description = "Frontend EC2 instance type"
+  type        = string
+  default     = "t3.micro"
 }
 
 variable "domain_name" {
-    default = "hariawsdevops.online"
+  type    = string
+  default = "hariawsdevops.online"
+}
+
+variable "zone_id" {
+  type    = string
+  default = "Z00916842MCDX0S5FWPWY"
+}
+
+variable "common_tags" {
+  type = map(string)
+
+  default = {
+    Project     = "expense"
+    Environment = "dev"
+    Terraform   = "true"
+  }
 }
