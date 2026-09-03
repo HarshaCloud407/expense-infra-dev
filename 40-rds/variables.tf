@@ -22,9 +22,11 @@ variable "domain_name" {
   default = "hariawsdevops.online"
 }
 
-# RDS MySQL password
+# ---------------------------------------------------------
+# RDS MySQL Master Password
+# ---------------------------------------------------------
 variable "db_password" {
-  description = "ExpenseApp@1"
+  description = "Master password for RDS MySQL database"
   type        = string
   sensitive   = true
 }
