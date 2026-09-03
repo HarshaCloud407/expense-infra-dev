@@ -1,20 +1,34 @@
 terraform {
+  required_version = ">= 1.5.0"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "5.84.0"
     }
+
+    null = {
+      source = "hashicorp/null"
+    }
   }
 
   backend "s3" {
-    bucket = "82s-tf-remote-state-dev-hyd"
-    key    = "expense-dev-backend" # you should have unique keys with in the bucket, same key should not be used in other repos or tf projects
-    region = "us-east-1"
+    bucket         = "82s-tf-remote-state-dev-hyd"
+    key            = "expense-dev-backend"
+    region         = "us-east-1"
     dynamodb_table = "82s-tf-remote-state-dev-hyd"
+    encrypt        = true
   }
 }
 
 provider "aws" {
-  # Configuration options
   region = "us-east-1"
+
+  default_tags {
+    tags = {
+      Project     = "expense"
+      Environment = "dev"
+      Terraform   = "true"
+    }
+  }
 }

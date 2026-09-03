@@ -20,3 +20,15 @@ variable "common_tags" {
     Terraform   = "true"
   }
 }
+
+variable "zone_id" {
+  description = "Route53 Hosted Zone ID"
+  type        = string
+  default     = "Z00916842MCDX0S5FWPWY"
+}
+
+variable "domain_name" {
+  description = "Application domain name"
+  type        = string
+  default     = "hariawsdevops.online"
+}
