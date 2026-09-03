@@ -30,7 +30,7 @@ data "aws_ami" "joindevops" {
 
 
 # =========================================================
-# VPC ID
+# VPC
 # =========================================================
 
 data "aws_ssm_parameter" "vpc_id" {
@@ -48,7 +48,7 @@ data "aws_ssm_parameter" "private_subnet_ids" {
 
 
 # =========================================================
-# BACKEND SECURITY GROUP ID
+# BACKEND SECURITY GROUP
 # =========================================================
 
 data "aws_ssm_parameter" "backend_sg_id" {

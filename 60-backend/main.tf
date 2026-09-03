@@ -1,4 +1,13 @@
 # =========================================================
+# EXISTING APPLICATION ALB
+# =========================================================
+
+data "aws_lb" "app_alb" {
+  name = "expense-dev-app-alb"
+}
+
+
+# =========================================================
 # BACKEND EC2 INSTANCE
 # =========================================================
 
@@ -19,9 +28,7 @@ resource "aws_instance" "backend" {
 
     echo "Backend server setup started"
 
-    # -----------------------------------------------------
-    # Backend application installation goes here.
-    # -----------------------------------------------------
+    # Add your backend application installation here.
 
     echo "Backend server setup completed"
   EOF
@@ -114,7 +121,7 @@ resource "aws_lb_listener_rule" "backend" {
 
 
 # =========================================================
-# ROUTE53 RECORD
+# ROUTE53 DNS RECORD
 # =========================================================
 
 resource "aws_route53_record" "backend" {
@@ -152,9 +159,7 @@ resource "aws_launch_template" "backend" {
 
     echo "Backend application server starting"
 
-    # -----------------------------------------------------
-    # Install/start your backend application here.
-    # -----------------------------------------------------
+    # Add backend application installation here.
 
     echo "Backend application server started"
   EOF
@@ -185,7 +190,7 @@ resource "aws_launch_template" "backend" {
 
 
 # =========================================================
-# AUTO SCALING GROUP
+# BACKEND AUTO SCALING GROUP
 # =========================================================
 
 resource "aws_autoscaling_group" "backend" {
