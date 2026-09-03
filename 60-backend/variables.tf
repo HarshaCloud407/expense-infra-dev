@@ -5,7 +5,7 @@ variable "project_name" {
 }
 
 variable "environment" {
-  description = "Environment name"
+  description = "Environment"
   type        = string
   default     = "dev"
 }
@@ -28,7 +28,7 @@ variable "zone_id" {
 }
 
 variable "domain_name" {
-  description = "Route53 domain name"
+  description = "Domain name"
   type        = string
   default     = "hariawsdevops.online"
 }

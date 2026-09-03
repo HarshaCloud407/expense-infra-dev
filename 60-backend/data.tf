@@ -9,7 +9,7 @@ data "aws_ami" "joindevops" {
 
   filter {
     name   = "name"
-    values = ["RHEL-9-DevOps-Practice*"]
+    values = ["Redhat-9-DevOps-Practice"]
   }
 
   filter {
@@ -30,7 +30,7 @@ data "aws_ami" "joindevops" {
 
 
 # =========================================================
-# VPC
+# VPC ID
 # =========================================================
 
 data "aws_ssm_parameter" "vpc_id" {
@@ -48,7 +48,7 @@ data "aws_ssm_parameter" "private_subnet_ids" {
 
 
 # =========================================================
-# BACKEND SECURITY GROUP
+# BACKEND SECURITY GROUP ID
 # =========================================================
 
 data "aws_ssm_parameter" "backend_sg_id" {
