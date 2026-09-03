@@ -8,7 +8,7 @@ module "db" {
   # RDS Engine
   # ---------------------------------------------------------
   engine            = "mysql"
-  engine_version    = "8.0.40"
+  engine_version    = "8.0"
   instance_class    = "db.t4g.micro"
   allocated_storage = 20
 
