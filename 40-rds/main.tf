@@ -2,7 +2,7 @@ module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "7.2.1"
 
-  identifier = local.resource_name # expense-dev
+  identifier = local.resource_name
 
   # ---------------------------------------------------------
   # RDS Engine
@@ -28,16 +28,18 @@ module "db" {
   # ---------------------------------------------------------
   # Security Group
   # ---------------------------------------------------------
-  vpc_security_group_ids = [local.mysql_sg_id]
+  vpc_security_group_ids = [
+    local.mysql_sg_id
+  ]
 
   # ---------------------------------------------------------
-  # DB subnet group
+  # DB Subnet Group
   # ---------------------------------------------------------
   create_db_subnet_group = false
   db_subnet_group_name   = local.database_subnet_group_name
 
   # ---------------------------------------------------------
-  # DB parameter group
+  # DB Parameter Group
   # ---------------------------------------------------------
   family = "mysql8.0"
 
@@ -53,7 +55,12 @@ module "db" {
   ]
 
   # ---------------------------------------------------------
-  # Database deletion protection
+  # DB Option Group
+  # ---------------------------------------------------------
+  major_engine_version = "8.0"
+
+  # ---------------------------------------------------------
+  # Database Deletion Protection
   # ---------------------------------------------------------
   deletion_protection = false
   skip_final_snapshot = true
@@ -70,7 +77,7 @@ module "db" {
 }
 
 # -------------------------------------------------------------
-# Route53 DNS record
+# Route53 DNS Record
 # -------------------------------------------------------------
 
 resource "aws_route53_record" "www-dev" {
