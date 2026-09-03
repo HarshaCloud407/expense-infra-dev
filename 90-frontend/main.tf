@@ -4,7 +4,7 @@
 
 resource "aws_instance" "frontend" {
   ami           = data.aws_ami.joindevops.id
-  instance_type = var.instance_type
+  instance_type = "t3.micro"
 
   subnet_id = local.public_subnet_id
 
@@ -17,18 +17,17 @@ resource "aws_instance" "frontend" {
   tags = merge(
     var.common_tags,
     {
-      Name = local.resource_name
+      Name = "${var.project_name}-${var.environment}-frontend"
     }
   )
 }
 
 
 # =========================================================
-# FRONTEND PROVISIONING
+# FRONTEND CONFIGURATION
 # =========================================================
 
 resource "null_resource" "frontend" {
-
   triggers = {
     instance_id = aws_instance.frontend.id
   }
@@ -51,10 +50,6 @@ resource "null_resource" "frontend" {
       "sudo sh /tmp/frontend.sh ${var.environment}"
     ]
   }
-
-  depends_on = [
-    aws_instance.frontend
-  ]
 }
 
 
@@ -73,7 +68,7 @@ resource "aws_ec2_instance_state" "frontend" {
 
 
 # =========================================================
-# CREATE FRONTEND GOLDEN AMI
+# CREATE FRONTEND AMI
 # =========================================================
 
 resource "aws_ami_from_instance" "frontend" {
@@ -83,15 +78,21 @@ resource "aws_ami_from_instance" "frontend" {
   depends_on = [
     aws_ec2_instance_state.frontend
   ]
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name = local.resource_name
+    }
+  )
 }
 
 
 # =========================================================
-# DELETE ORIGINAL FRONTEND INSTANCE
+# DELETE TEMPORARY FRONTEND INSTANCE
 # =========================================================
 
 resource "null_resource" "frontend_delete" {
-
   triggers = {
     instance_id = aws_instance.frontend.id
   }
@@ -115,10 +116,7 @@ resource "aws_lb_target_group" "frontend" {
 
   port     = 80
   protocol = "HTTP"
-
-  vpc_id = local.vpc_id
-
-  target_type = "instance"
+  vpc_id   = local.vpc_id
 
   deregistration_delay = 60
 
@@ -126,18 +124,18 @@ resource "aws_lb_target_group" "frontend" {
     enabled             = true
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    interval            = 10
     timeout             = 5
     protocol            = "HTTP"
     port                = "traffic-port"
     path                = "/"
     matcher             = "200-299"
+    interval            = 10
   }
 
   tags = merge(
     var.common_tags,
     {
-      Name = "${local.resource_name}-tg"
+      Name = "${var.project_name}-${var.environment}-frontend-tg"
     }
   )
 }
@@ -148,12 +146,11 @@ resource "aws_lb_target_group" "frontend" {
 # =========================================================
 
 resource "aws_launch_template" "frontend" {
-
   name = local.resource_name
 
   image_id = aws_ami_from_instance.frontend.id
 
-  instance_type = var.instance_type
+  instance_type = "t3.micro"
 
   instance_initiated_shutdown_behavior = "terminate"
 
@@ -192,21 +189,20 @@ resource "aws_launch_template" "frontend" {
 # =========================================================
 
 resource "aws_autoscaling_group" "frontend" {
-
   name = local.resource_name
 
   min_size         = 1
-  max_size         = 10
+  max_size         = 2
   desired_capacity = 1
 
   health_check_type         = "ELB"
   health_check_grace_period = 180
 
-  vpc_zone_identifier = local.public_subnet_ids
-
   target_group_arns = [
     aws_lb_target_group.frontend.arn
   ]
+
+  vpc_zone_identifier = local.public_subnet_ids
 
   launch_template {
     id      = aws_launch_template.frontend.id
@@ -256,7 +252,6 @@ resource "aws_autoscaling_group" "frontend" {
 # =========================================================
 
 resource "aws_autoscaling_policy" "frontend" {
-
   name = "${local.resource_name}-scaling"
 
   policy_type = "TargetTrackingScaling"
@@ -264,7 +259,6 @@ resource "aws_autoscaling_policy" "frontend" {
   autoscaling_group_name = aws_autoscaling_group.frontend.name
 
   target_tracking_configuration {
-
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
@@ -279,7 +273,6 @@ resource "aws_autoscaling_policy" "frontend" {
 # =========================================================
 
 resource "aws_lb_listener_rule" "frontend" {
-
   listener_arn = data.aws_ssm_parameter.web_alb_listener_arn.value
 
   priority = 10
