@@ -39,36 +39,27 @@ data "aws_ssm_parameter" "vpc_id" {
 
 
 # =========================================================
-# PRIVATE SUBNET IDS
+# PUBLIC SUBNET IDS
 # =========================================================
 
-data "aws_ssm_parameter" "private_subnet_ids" {
-  name = "/${var.project_name}/${var.environment}/private_subnet_ids"
+data "aws_ssm_parameter" "public_subnet_ids" {
+  name = "/${var.project_name}/${var.environment}/public_subnet_ids"
 }
 
 
 # =========================================================
-# BACKEND SECURITY GROUP ID
+# FRONTEND SECURITY GROUP ID
 # =========================================================
 
-data "aws_ssm_parameter" "backend_sg_id" {
-  name = "/${var.project_name}/${var.environment}/backend_sg_id"
+data "aws_ssm_parameter" "frontend_sg_id" {
+  name = "/${var.project_name}/${var.environment}/frontend_sg_id"
 }
 
 
 # =========================================================
-# APPLICATION ALB LISTENER ARN
+# WEB ALB LISTENER ARN
 # =========================================================
 
-data "aws_ssm_parameter" "app_alb_listener_arn" {
-  name = "/${var.project_name}/${var.environment}/app_alb_listener_arn"
-}
-
-
-# =========================================================
-# EXISTING APPLICATION ALB
-# =========================================================
-
-data "aws_lb" "app_alb" {
-  name = "expense-dev-app-alb"
+data "aws_ssm_parameter" "web_alb_listener_arn" {
+  name = "/${var.project_name}/${var.environment}/web_alb_listener_arn"
 }
