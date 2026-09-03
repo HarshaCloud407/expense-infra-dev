@@ -24,7 +24,7 @@ variable "domain_name" {
 
 # RDS MySQL password
 variable "db_password" {
-  description = "Master password for RDS MySQL database"
+  description = "ExpenseApp@1"
   type        = string
   sensitive   = true
 }
