@@ -1,30 +1,23 @@
-data "aws_ssm_parameter" "bastion_sg_id" {
-  #/roboshop/dev/bastion_sg_id
-  name = "/${var.project_name}/${var.environment}/bastion_sg_id"
+# ---------------------------------------------------------
+# VPC ID
+# ---------------------------------------------------------
+
+data "aws_ssm_parameter" "vpc_id" {
+  name = "/${var.project_name}/${var.environment}/vpc_id"
 }
 
-data "aws_ssm_parameter" "public_subnet_ids" {
-  #/roboshop/dev/public_subnet_ids
-  name = "/${var.project_name}/${var.environment}/public_subnet_ids"
+# ---------------------------------------------------------
+# Private Subnet IDs
+# ---------------------------------------------------------
+
+data "aws_ssm_parameter" "private_subnet_ids" {
+  name = "/${var.project_name}/${var.environment}/private_subnet_ids"
 }
 
-data "aws_ami" "joindevops" {
+# ---------------------------------------------------------
+# Backend Security Group ID
+# ---------------------------------------------------------
 
-	most_recent      = true
-	owners = ["973714476881"]
-	
-	filter {
-		name   = "name"
-		values = ["Redhat-9-DevOps-Practice"]
-	}
-	
-	filter {
-		name   = "root-device-type"
-		values = ["ebs"]
-	}
-
-    filter {
-        name   = "virtualization-type"
-        values = ["hvm"]
-    }
+data "aws_ssm_parameter" "backend_sg_id" {
+  name = "/${var.project_name}/${var.environment}/backend_sg_id"
 }

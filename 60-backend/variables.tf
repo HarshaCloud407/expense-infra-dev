@@ -1,19 +1,22 @@
 variable "project_name" {
-    default = "expense"
+  description = "Project name"
+  type        = string
+  default     = "expense"
 }
 
 variable "environment" {
-    default = "dev"
+  description = "Environment name"
+  type        = string
+  default     = "dev"
 }
 
 variable "common_tags" {
-    default = {
-        Project = "expense"
-        Environment = "dev"
-        Terraform = "true"
-    }
-}
+  description = "Common tags for all resources"
+  type        = map(string)
 
-variable "domain_name" {
-    default = "hariawsdevops.online"
+  default = {
+    Project     = "expense"
+    Environment = "dev"
+    Terraform   = "true"
+  }
 }
