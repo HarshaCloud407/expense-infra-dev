@@ -1,23 +1,30 @@
 variable "project_name" {
-    default = "expense"
+  default = "expense"
 }
 
 variable "environment" {
-    default = "dev"
+  default = "dev"
 }
 
 variable "common_tags" {
-    default = {
-        Project = "expense"
-        Environment = "dev"
-        Terraform = "true"
-    }
+  default = {
+    Project     = "expense"
+    Environment = "dev"
+    Terraform   = "true"
+  }
 }
 
 variable "zone_id" {
-    default = "Z00916842MCDX0S5FWPWY"
+  default = "Z00916842MCDX0S5FWPWY"
 }
 
 variable "domain_name" {
-    default = "hariawsdevops.online"
+  default = "hariawsdevops.online"
+}
+
+# RDS MySQL password
+variable "db_password" {
+  description = "Master password for RDS MySQL database"
+  type        = string
+  sensitive   = true
 }
