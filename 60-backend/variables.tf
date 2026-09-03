@@ -11,7 +11,7 @@ variable "environment" {
 }
 
 variable "common_tags" {
-  description = "Common tags for all resources"
+  description = "Common tags"
   type        = map(string)
 
   default = {
@@ -22,13 +22,25 @@ variable "common_tags" {
 }
 
 variable "zone_id" {
-  description = "Route53 Hosted Zone ID"
+  description = "Route53 hosted zone ID"
   type        = string
   default     = "Z00916842MCDX0S5FWPWY"
 }
 
 variable "domain_name" {
-  description = "Application domain name"
+  description = "Route53 domain name"
   type        = string
   default     = "hariawsdevops.online"
+}
+
+variable "instance_type" {
+  description = "Backend EC2 instance type"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "backend_port" {
+  description = "Backend application port"
+  type        = number
+  default     = 8080
 }

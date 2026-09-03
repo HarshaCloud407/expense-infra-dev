@@ -48,7 +48,7 @@ data "aws_ssm_parameter" "private_subnet_ids" {
 
 
 # =========================================================
-# BACKEND SECURITY GROUP
+# BACKEND SECURITY GROUP ID
 # =========================================================
 
 data "aws_ssm_parameter" "backend_sg_id" {
@@ -62,4 +62,13 @@ data "aws_ssm_parameter" "backend_sg_id" {
 
 data "aws_ssm_parameter" "app_alb_listener_arn" {
   name = "/${var.project_name}/${var.environment}/app_alb_listener_arn"
+}
+
+
+# =========================================================
+# EXISTING APPLICATION ALB
+# =========================================================
+
+data "aws_lb" "app_alb" {
+  name = "expense-dev-app-alb"
 }

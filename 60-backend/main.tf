@@ -4,7 +4,7 @@
 
 resource "aws_instance" "backend" {
   ami           = data.aws_ami.joindevops.id
-  instance_type = "t3.micro"
+  instance_type = var.instance_type
 
   subnet_id = local.private_subnet_id
 
@@ -15,14 +15,16 @@ resource "aws_instance" "backend" {
   associate_public_ip_address = false
 
   user_data = <<-EOF
-              #!/bin/bash
-              echo "Backend server setup started"
+    #!/bin/bash
 
-              # Add your backend application installation
-              # commands here.
+    echo "Backend server setup started"
 
-              echo "Backend server setup completed"
-              EOF
+    # -----------------------------------------------------
+    # Backend application installation goes here.
+    # -----------------------------------------------------
+
+    echo "Backend server setup completed"
+  EOF
 
   tags = merge(
     var.common_tags,
@@ -38,13 +40,9 @@ resource "aws_instance" "backend" {
 # =========================================================
 
 resource "aws_lb_target_group" "backend" {
-  name = substr(
-    "${var.project_name}-${var.environment}-backend",
-    0,
-    32
-  )
+  name = "${var.project_name}-${var.environment}-backend-tg"
 
-  port     = 8080
+  port     = var.backend_port
   protocol = "HTTP"
 
   vpc_id = local.vpc_id
@@ -77,8 +75,10 @@ resource "aws_lb_target_group" "backend" {
 
 resource "aws_lb_target_group_attachment" "backend" {
   target_group_arn = aws_lb_target_group.backend.arn
-  target_id        = aws_instance.backend.id
-  port             = 8080
+
+  target_id = aws_instance.backend.id
+
+  port = var.backend_port
 }
 
 
@@ -99,34 +99,28 @@ resource "aws_lb_listener_rule" "backend" {
   condition {
     host_header {
       values = [
-        "backend-${var.environment}.${var.domain_name}"
+        local.backend_dns_name
       ]
     }
   }
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${local.resource_name}-listener-rule"
+    }
+  )
 }
 
 
 # =========================================================
 # ROUTE53 RECORD
 # =========================================================
-#
-# The application ALB already exists.
-# We therefore retrieve the ALB through the listener ARN
-# instead of creating another ALB.
-# =========================================================
-
-data "aws_lb" "app_alb" {
-  arn = replace(
-    data.aws_ssm_parameter.app_alb_listener_arn.value,
-    "/listeners/.*$/",
-    ""
-  )
-}
 
 resource "aws_route53_record" "backend" {
   zone_id = var.zone_id
 
-  name = "backend-${var.environment}.${var.domain_name}"
+  name = local.backend_dns_name
 
   type = "A"
 
@@ -139,7 +133,7 @@ resource "aws_route53_record" "backend" {
 
 
 # =========================================================
-# AUTO SCALING LAUNCH TEMPLATE
+# LAUNCH TEMPLATE
 # =========================================================
 
 resource "aws_launch_template" "backend" {
@@ -147,22 +141,23 @@ resource "aws_launch_template" "backend" {
 
   image_id = data.aws_ami.joindevops.id
 
-  instance_type = "t3.micro"
+  instance_type = var.instance_type
 
   vpc_security_group_ids = [
     local.backend_sg_id
   ]
 
   user_data = base64encode(<<-EOF
-              #!/bin/bash
+    #!/bin/bash
 
-              echo "Backend application server starting"
+    echo "Backend application server starting"
 
-              # Add your backend installation/deployment
-              # commands here.
+    # -----------------------------------------------------
+    # Install/start your backend application here.
+    # -----------------------------------------------------
 
-              echo "Backend application server started"
-              EOF
+    echo "Backend application server started"
+  EOF
   )
 
   tag_specifications {

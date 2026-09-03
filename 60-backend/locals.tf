@@ -30,4 +30,11 @@ locals {
   # =======================================================
 
   backend_sg_id = data.aws_ssm_parameter.backend_sg_id.value
+
+
+  # =======================================================
+  # BACKEND DNS
+  # =======================================================
+
+  backend_dns_name = "backend-${var.environment}.${var.domain_name}"
 }
